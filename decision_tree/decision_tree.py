@@ -1,3 +1,4 @@
+from typing import Counter
 import numpy as np 
 import pandas as pd 
 from copy import deepcopy
@@ -35,23 +36,37 @@ class DecisionTree:
                 to the features.
             y (pd.Series): a vector of discrete ground-truth labels
         """
+
+        #self.label = y.mode()[0]
+
+        
+
         attrs = X.columns #attributes are columns in the DataFrame object
+        most_common_target = y.mode()[0]
         #node = Node()
         # If all examples are positive (or all negative), return the single Node tree root with positive/negative label
         # In other words, if all y have the same value, the Node gets the label equal to that value
         if len(np.unique(y))==1 :      
-            self.label = np.unique(y)[0]
+            self.label = np.unique(y)[0]  
         # If attributes is empty, return the root, with label = most common target attribute
         elif len(attrs) == 0:
-            most_common_target = y.mode()[0]
+            
             self.label = most_common_target
-
         else:
             # A = attr from attrs that best classifies Examples (y-s)
-            A = max(attrs, key = lambda attr: gain(X, y, attr))
+            A = max(attrs, key = lambda attr: gain_ratio(X, y, attr))
             # the decision attr for root = A
             self.attribute = A
             possible_vals = X[A].unique()  
+
+            ### task b related
+            child_node = DecisionTree()
+            child_node.parent = self
+            child_node.label = most_common_target
+            self.children["other"] = child_node
+
+            ###
+
             for val in possible_vals:
                 # find subset of X, y where A = val
                 y_subset = y[X[A] == val]
@@ -64,7 +79,7 @@ class DecisionTree:
                 else:    
                     child_node.fit(X_subset.drop(columns =[A]), y_subset)
                     self.children[val] = child_node
-            
+
 
 
 
@@ -93,10 +108,16 @@ class DecisionTree:
             dt = self
             attr = dt.attribute
             while (attr is not None):
-                dt = dt.children[row[attr]]
-                attr = dt.attribute
-            y.append(dt.label)
+                if row[attr] in dt.children.keys():
+                    dt = dt.children[row[attr]]
+                    attr = dt.attribute
+                    label = dt.label
+                else:
+                    label = dt.children["other"].label
+                    attr = None
+            y.append(label)
             dt = go_to_root(dt)
+            
 
         #y = pd.DataFrame(y)
         return np.array(y)
@@ -160,6 +181,11 @@ def gain(X, y, A):
         y_partitioned = [y[X[A] == val] for val in values]
         val_counts = y.value_counts()
         return  entropy(val_counts) - np.sum([entropy(partition.value_counts())*len(partition)/len(y) for partition in y_partitioned]) # according (3.4), page 58
+
+def gain_ratio(X, y, A):
+    val_counts = X[A].value_counts()
+    return gain(X, y, A)/(0.001 + entropy(val_counts))**2
+
 
 def accuracy(y_true, y_pred):
     """
