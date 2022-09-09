@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd 
 import decision_tree as dt
 
-from decision_tree import  DecisionTree, Node, go_to_root
+from decision_tree import  DecisionTree, go_to_root
 
 visited = list() # visited nodes
 def traverse_tree(dt, tuples, matrix, visited = list()):
@@ -65,41 +65,6 @@ def main():
     print(f'Valid: {dt.accuracy(y_valid, model_2.predict(X_valid)) * 100 :.1f}%')
     print(f'Valid: {dt.accuracy(y_test, model_2.predict(X_test)) * 100 :.1f}%')
 
-   
-
-    
-    
-"""
-    [
-            ([('Outlook', 'Overcast')], 'Yes'),
-            ([('Outlook', 'Rain'), ('Wind', 'Strong')], 'No'),
-            ...
-        ]
-
-        """
-"""
-    data_2 = pd.read_csv('data_2.csv')
-    data_2_train = data_2.query('Split == "train"')
-    data_2_valid = data_2.query('Split == "valid"')
-    data_2_test = data_2.query('Split == "test"')
-    X_train, y_train = data_2_train.drop(columns=['Outcome', 'Split']), data_2_train.Outcome
-    X_valid, y_valid = data_2_valid.drop(columns=['Outcome', 'Split']), data_2_valid.Outcome
-    X_test, y_test = data_2_test.drop(columns=['Outcome', 'Split']), data_2_test.Outcome
-
-
-
-    model_2 = dt.DecisionTree()  # <-- Feel free to add hyperparameters 
-    model_2.fit(X_train, y_train)
-    #print(f'Train: {dt.accuracy(y_train, model_2.predict(X_train)) * 100 :.1f}%')
-    #print(X_train.columns)
-    #print(X_valid.columns)
-
-    #y = model_2.predict(X_train)
-    print(X_train)
-    print("----")
-    print(X_valid)
-    #print(f'Valid: {dt.accuracy(y_valid, model_2.predict(X_valid)) * 100 :.1f}%')
-    """
 
 
 if __name__ == '__main__':
