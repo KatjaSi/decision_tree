@@ -13,6 +13,7 @@ class DecisionTree:
         self.attribute = None
         self.label = None
         self.visited_children = 0
+
     def fit(self, X, y):
         """
         Generates a decision tree for classification
@@ -139,9 +140,16 @@ def gain(X, y, A):
         val_counts = y.value_counts()
         return  entropy(val_counts) - np.sum([entropy(partition.value_counts())*len(partition)/len(y) for partition in y_partitioned]) # according (3.4), page 58
 
+
 def gain_ratio(X, y, A):
+    """
+    returns the gain ration of an attribute A relative to the collection with examples X and corresponding targets y,
+    se. page 74, the formula is slightly updated to avoid dividing by zero, and to stronger discremenate
+    the attributes which give big values of entropy
+    """
     val_counts = X[A].value_counts()
     return gain(X, y, A)/(0.001 + entropy(val_counts))**1.3
+
 
 def accuracy(y_true, y_pred):
     """
