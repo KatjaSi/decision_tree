@@ -138,7 +138,8 @@ def gain(X, y, A):
         values = X[A].unique()
         y_partitioned = [y[X[A] == val] for val in values]
         val_counts = y.value_counts()
-        return  entropy(val_counts) - np.sum([entropy(partition.value_counts())*len(partition)/len(y) for partition in y_partitioned]) # according (3.4), page 58
+        # according (3.4), page 58
+        return  entropy(val_counts) - np.sum([entropy(partition.value_counts())*len(partition)/len(y) for partition in y_partitioned]) 
 
 
 def gain_ratio(X, y, A):
